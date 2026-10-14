@@ -4,159 +4,293 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EmiState-HDR</title>
-<meta name="description" content="EmiState-HDR: a synthetic indoor HDR multi-state dataset and learned selection for storing observed emissive states with 3D Gaussian Splatting.">
+<meta name="description" content="EmiState-HDR: a synthetic indoor HDR dataset of observed emissive states, with state-specific training views, intermediate-state ground truth, emissive masks and a per-view audit.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fbfaf7; --surface:#f3f1ec; --fg:#1d1c1a; --muted:#5f5b54; --line:#e2ded6;
-  --accent:#b45f06; --accent-soft:#f6e7d4; --code-bg:#f0ede6;
+  --bg:#fbfaf8; --surface:#f2efea; --card:#ffffff; --fg:#1b1a18; --muted:#615c55; --line:#e3dfd8;
+  --accent:#c2620a; --accent-2:#1f6f8b; --accent-soft:#f7e8d6; --code:#f1eee8; --hero:#121110; --hero-fg:#f4f1ec;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#141311; --surface:#1d1c19; --fg:#ecebe7; --muted:#a9a59c; --line:#34312c;
-    --accent:#f0a24a; --accent-soft:#3a2a17; --code-bg:#22201c; color-scheme:dark;
+    --bg:#121110; --surface:#1b1a18; --card:#201f1c; --fg:#ece9e3; --muted:#a8a29a; --line:#33302b;
+    --accent:#f0a24a; --accent-2:#6fb7d0; --accent-soft:#3a2915; --code:#1e1d1a; --hero:#0b0a09; --hero-fg:#f4f1ec; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#141311; --surface:#1d1c19; --fg:#ecebe7; --muted:#a9a59c; --line:#34312c;
-  --accent:#f0a24a; --accent-soft:#3a2a17; --code-bg:#22201c; color-scheme:dark;
+  --bg:#121110; --surface:#1b1a18; --card:#201f1c; --fg:#ece9e3; --muted:#a8a29a; --line:#33302b;
+  --accent:#f0a24a; --accent-2:#6fb7d0; --accent-soft:#3a2915; --code:#1e1d1a; --hero:#0b0a09; --hero-fg:#f4f1ec; color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:56px 72px}
-header{text-align:center;display:grid;gap:18px}
-h1{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:clamp(28px,4.6vw,44px);line-height:1.15;margin:0;text-wrap:balance}
-h1 .name{color:var(--accent)}
-.subtitle{font-family:"Source Serif 4",Georgia,serif;font-size:clamp(18px,2.4vw,22px);font-weight:500;color:var(--muted);margin:0;text-wrap:balance}
-.authors{font-size:17px;margin:4px 0 0}
-.authors a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
-.affil{font-size:14px;color:var(--muted);margin:0}
-.venue{display:inline-block;justify-self:center;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:4px 12px;border-radius:999px}
-.links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;font-weight:500;font-size:15px;text-decoration:none;border:1px solid var(--fg);color:var(--fg)}
-.btn.primary{background:var(--fg);color:var(--bg)}
-.btn.off{border-color:var(--line);color:var(--muted);cursor:default}
-.btn small{font-weight:400;font-size:12px;opacity:.8}
-figure{margin:40px 0 0}
-figure img{display:block;width:100%;max-width:100%;height:auto;border-radius:6px;background:#fff;border:1px solid var(--line)}
-figcaption{font-size:14px;color:var(--muted);margin-top:10px}
-section{margin-top:56px}
-h2{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:26px;margin:0 0 14px}
-p{margin:0 0 14px;max-width:72ch}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:6px}
-.stat{background:var(--surface);padding:16px 18px}
-.stat b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
-.stat span{font-size:13px;color:var(--muted)}
-ul.plain{margin:6px 0 0;padding-left:20px;max-width:72ch}
-ul.plain li{margin:4px 0}
-.tbl{overflow-x:auto;margin-top:6px}
-table{border-collapse:collapse;font-size:14px;min-width:520px;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:7px 14px 7px 0;border-bottom:1px solid var(--line)}
-th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
-pre{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:14px 16px;overflow-x:auto;font:13px/1.55 "IBM Plex Mono",ui-monospace,monospace;margin:6px 0 14px}
-code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.92em}
-.note{font-size:14px;color:var(--muted)}
-.copy{float:right;font:12px "IBM Plex Sans",sans-serif;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:4px;padding:3px 9px;cursor:pointer}
-footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 "Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif}
+.container{max-width:1060px;margin:0 auto;padding-inline:20px}
+.narrow{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:Manrope,system-ui,sans-serif;letter-spacing:-.01em;text-wrap:balance}
+/* hero */
+.hero{background:var(--hero);color:var(--hero-fg);padding-block:64px 40px;text-align:center}
+.hero h1{font-size:clamp(34px,6vw,60px);font-weight:800;margin:0;line-height:1.05}
+.hero h1 span{color:#f0a24a}
+.hero .sub{font-family:Manrope,sans-serif;font-weight:500;font-size:clamp(17px,2.3vw,22px);margin:14px auto 0;max-width:760px;color:#d9d3ca}
+.hero .authors{margin:26px 0 2px;font-size:18px}
+.hero .affil{margin:0;font-size:14px;color:#aaa39a}
+.btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;font:600 15px Manrope,sans-serif;text-decoration:none;background:#2a2826;color:#f4f1ec;border:1px solid #3b3834}
+.btn.primary{background:#f0a24a;color:#1b1a18;border-color:#f0a24a}
+.btn small{font-weight:500;font-size:12px;opacity:.75}
+.btn svg{width:17px;height:17px;flex:none}
+.doi{margin-top:14px;font-size:13px;color:#aaa39a}
+.doi a{color:#d9d3ca}
+/* viewer */
+.viewer{margin:34px auto 0;max-width:900px;text-align:left}
+.vtabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;background:#23211e;border:1px solid #3b3834;border-radius:999px;padding:3px}
+.seg button{all:unset;cursor:pointer;padding:6px 14px;border-radius:999px;font:600 14px Manrope,sans-serif;color:#cfc8be}
+.seg button[aria-pressed="true"]{background:#f4f1ec;color:#1b1a18}
+.stage{position:relative;aspect-ratio:1/1;width:min(100%,640px);border-radius:10px;overflow:hidden;background:#000;max-height:72vh;margin:0 auto}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease}
+.alpha{position:absolute;left:14px;top:12px;background:rgba(0,0,0,.55);color:#fff;font:600 14px "JetBrains Mono",monospace;padding:4px 10px;border-radius:6px}
+.desc{position:absolute;right:14px;bottom:12px;left:14px;text-align:right;color:#fff;font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.ctrl{display:flex;gap:12px;align-items:center;margin-top:12px}
+.ctrl button{all:unset;cursor:pointer;width:38px;height:38px;border-radius:50%;background:#f4f1ec;color:#1b1a18;display:grid;place-items:center;flex:none}
+.ctrl input{flex:1;accent-color:#f0a24a;min-width:0}
+.ticks{display:flex;justify-content:space-between;font:12px "JetBrains Mono",monospace;color:#aaa39a;margin:2px 0 0 50px}
+.vnote{font-size:13px;color:#aaa39a;margin-top:8px;text-align:center}
+/* sections */
+section{padding-block:60px 0}
+h2{font-size:clamp(26px,3.4vw,34px);margin:0 0 18px;font-weight:800;text-align:center}
+.lead{text-align:center;color:var(--muted);max-width:720px;margin:-6px auto 26px}
+p{margin:0 0 14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;text-align:center}
+.stat b{display:block;font:800 30px/1.15 Manrope,sans-serif;font-variant-numeric:tabular-nums;color:var(--accent)}
+.stat span{font-size:14px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;min-width:0}
+.card h3{font-size:18px;margin:0 0 6px}
+.card p{font-size:15.5px;color:var(--muted);margin:0}
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.grp h3{font-size:16px;margin:0 0 10px}
+.gallery{display:grid;gap:8px}
+.gallery figure{margin:0}
+.gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;display:block;border:1px solid var(--line)}
+.gallery figcaption{font:13px "JetBrains Mono",monospace;color:var(--muted);text-align:center;margin-top:4px}
+.fig img{width:100%;max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff;display:block}
+.fig figcaption{font-size:14.5px;color:var(--muted);margin-top:10px;text-align:center}
+figure.fig{margin:0}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums;min-width:640px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font:700 12.5px Manrope,sans-serif;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--surface)}
+tr.ours td{background:var(--accent-soft);font-weight:600}
+tr:last-child td{border-bottom:0}
+.y{color:var(--accent-2);font-weight:700}.n{color:var(--muted)}
+.tnote{font-size:13.5px;color:var(--muted);margin-top:8px;text-align:center}
+pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font:13.5px/1.6 "JetBrains Mono",ui-monospace,monospace;margin:0 0 14px;position:relative}
+.copy{position:absolute;top:10px;right:10px;font:12px "Source Sans 3",sans-serif;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:6px;padding:3px 10px;cursor:pointer}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+footer{margin-top:72px;padding-block:26px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);text-align:center}
 a{color:var(--accent)}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <span class="venue">Under review · Computational Visual Media</span>
-  <h1><span class="name">EmiState-HDR</span></h1>
-  <p class="subtitle">A Synthetic Indoor HDR Multi-State Dataset and Learned Selection for Storing Observed Emissive States</p>
+
+<div class="hero">
+ <div class="container">
+  <h1><span>EmiState</span>-HDR</h1>
+  <p class="sub">A Synthetic Indoor HDR Multi-State Dataset and Learned Selection for Storing Observed Emissive States</p>
   <p class="authors">Hogeon Lee<sup>1,2</sup> &nbsp;·&nbsp; Jaerin Ko<sup>3</sup> &nbsp;·&nbsp; Jangwon Lee<sup>1</sup></p>
   <p class="affil"><sup>1</sup>Sungkyunkwan University &nbsp; <sup>2</sup>SFACSPACE &nbsp; <sup>3</sup>Hongik University</p>
-  <nav class="links">
-    <a class="btn primary" href="https://huggingface.co/datasets/logun99/EmiState-HDR">Dataset</a>
-    <span class="btn off">Paper <small>coming soon</small></span>
-    <span class="btn off">Code <small>coming soon</small></span>
-  </nav>
-</header>
+  <div class="btns">
+   <a class="btn primary" href="https://huggingface.co/datasets/logun99/EmiState-HDR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Dataset</a>
+   <span class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Paper <small>coming soon</small></span>
+   <a class="btn" href="https://github.com/hogun5501/EmiState-HDR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Code <small>coming soon</small></a>
+  </div>
+  <p class="doi">Dataset DOI: <a href="https://doi.org/10.57967/hf/10897">10.57967/hf/10897</a> · CC BY-NC 4.0</p>
 
-<figure>
-  <img src="assets/fig1_teaser_v10.jpg" alt="Change maps between the base and target emissive states of an indoor scene, and target-state PSNR versus storage for equal-count selection methods" loading="eager">
-  <figcaption>When a display or light changes state, the change spreads well beyond the emitter. Even when only a TV screen turns on, 53.1% of the display-space image change lies outside the screen.</figcaption>
-</figure>
+  <div class="viewer" id="viewer">
+   <div class="vtabs">
+    <div class="seg" id="sceneSeg" role="group" aria-label="Scene"></div>
+    <div class="seg" id="pathSeg" role="group" aria-label="Transition"></div>
+   </div>
+   <div class="stage" id="stage">
+    <img id="imA" alt="">
+    <img id="imB" alt="" style="opacity:0">
+    <div class="alpha" id="alab">α = 0.0</div>
+    <div class="desc" id="vdesc"></div>
+   </div>
+   <div class="ctrl">
+    <button id="play" aria-label="Play or pause"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="pico"><path d="M7 4v16l13-8z"/></svg></button>
+    <input type="range" id="slider" min="0" max="4" step="1" value="0" aria-label="State value alpha">
+   </div>
+   <div class="ticks" id="ticks"></div>
+   <p class="vnote">Every frame is a separately rendered ground-truth state; no frames are interpolated.</p>
+  </div>
+ </div>
+</div>
 
-<section id="abstract">
-  <h2>Abstract</h2>
+<div class="container">
+
+<section>
+ <div class="stats">
+  <div class="stat"><b>4</b><span>indoor scenes</span></div>
+  <div class="stat"><b>13</b><span>configurations</span></div>
+  <div class="stat"><b>26</b><span>state transitions</span></div>
+  <div class="stat"><b>33,000</b><span>rendered HDR EXRs</span></div>
+  <div class="stat"><b>80 / 80 / 40</b><span>base · target · evaluation views</span></div>
+ </div>
+</section>
+
+<section>
+ <h2>Abstract</h2>
+ <div class="narrow">
   <p>When a display or light in a room changes state, the walls and floor that receive its light change too. Revisiting observed emissive states from novel views requires one stored representation per state, yet no public indoor dataset with state-specific training views supports measuring how compactly an additional state can be stored.</p>
   <p>We present EmiState-HDR, a synthetic high-dynamic-range dataset of four indoor scenes, 13 configurations and 26 state transitions, with disjoint training views per state, evaluation views shared by all states, intermediate-state ground truth with known state values, emissive-material masks, and a per-view linearity audit of the ground truth. With 3D Gaussian Splatting, keeping the same number of Gaussians from the same full target model under the same refinement, existing selection criteria span 5.06&nbsp;dB in target-state PSNR. As a baseline for this protocol, EmiState-GS learns a per-Gaussian gate from the target observations and keeps exactly the specified number of Gaussians.</p>
+ </div>
 </section>
 
-<section id="dataset">
-  <h2>Dataset at a glance</h2>
-  <div class="stats">
-    <div class="stat"><b>4</b><span>indoor scenes</span></div>
-    <div class="stat"><b>13</b><span>configurations</span></div>
-    <div class="stat"><b>26</b><span>state transitions</span></div>
-    <div class="stat"><b>33,000</b><span>rendered HDR EXRs</span></div>
-    <div class="stat"><b>80 / 80 / 40</b><span>base / target / eval views</span></div>
+<section>
+ <h2>What the dataset provides</h2>
+ <div class="cards">
+  <div class="card"><h3>State-specific training views</h3><p>Each transition has 80 base-state and 80 target-state training cameras that never overlap, as in real captures where each state is recorded separately.</p></div>
+  <div class="card"><h3>Intermediate-state ground truth</h3><p>States at α = 0.2, 0.5, 0.8 (TV: every 0.1) are rendered separately with known intensities, so the target and intermediate states can be scored at 40 shared evaluation views.</p></div>
+  <div class="card"><h3>Unclipped HDR, audited</h3><p>Renderer EXRs are released as saved. Every intermediate view is checked against the linear relation between the endpoints, and all flagged views are listed.</p></div>
+  <div class="card"><h3>Emissive-material masks</h3><p>Per-view masks of local emitters and light fixtures measure how much of a state change lies outside the emitter.</p></div>
+ </div>
+</section>
+
+<section>
+ <h2>13 configurations</h2>
+ <p class="lead">Target state of every configuration at one camera. Configurations of a scene change the content on the local emitter: a menu board, a picture frame, a sign or a TV screen.</p>
+ <div class="groups" id="gallery"></div>
+</section>
+
+<section>
+ <h2>The change spreads beyond the emitter</h2>
+ <p class="lead">Even when only a TV screen turns on, 53.1% of the display-space image change lies outside the screen, so a target state cannot be reproduced by updating the emissive region alone.</p>
+ <figure class="fig"><img src="assets/fig2_states_v10.jpg" alt="Base states, shared target state and change maps of the A and B transitions in the four scenes" loading="lazy">
+  <figcaption>A transitions raise the room lighting; B transitions raise the local emitter. Cyan outlines mark the emissive-material mask.</figcaption></figure>
+</section>
+
+<section>
+ <h2>Comparison with existing resources</h2>
+ <div class="tbl"><table>
+  <thead><tr><th>Resource</th><th>Type</th><th>Scenes</th><th>Images</th><th>HDR</th><th>Emissive mask</th><th>State-specific views</th><th>Intermediate-state GT</th></tr></thead>
+  <tbody>
+   <tr><td>HDR-NeRF</td><td>Real/synth., fwd.</td><td>12</td><td>2,100</td><td>partial</td><td class="n">✕</td><td class="n">–</td><td class="n">✕</td></tr>
+   <tr><td>Multi-Illumination</td><td>Real, indoor</td><td>1,016</td><td>25,400</td><td class="y">✓</td><td class="n">✕</td><td class="n">–</td><td class="n">✕</td></tr>
+   <tr><td>NeRF-OSR</td><td>Real, outdoor</td><td>8</td><td>3,240</td><td>partial</td><td class="n">✕</td><td>partial</td><td class="n">✕</td></tr>
+   <tr><td>OpenIllumination</td><td>Real, object</td><td>64</td><td>108k+</td><td class="n">✕</td><td class="n">✕</td><td class="n">✕</td><td class="n">✕</td></tr>
+   <tr><td>Eyeful Tower</td><td>Real, indoor</td><td>11</td><td>28,680</td><td class="y">✓</td><td class="n">✕</td><td class="n">–</td><td class="n">✕</td></tr>
+   <tr><td>ESR-NeRF</td><td>Synth., object</td><td>12</td><td>3,000</td><td>partial</td><td class="y">✓</td><td class="y">✓</td><td>✓ (0.5×)</td></tr>
+   <tr class="ours"><td>EmiState-HDR</td><td>Synth., indoor</td><td>4</td><td>33,000</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓ (3; TV 9)</td></tr>
+  </tbody></table></div>
+ <p class="tnote">Selected rows of Table 1 in the paper; entries follow each resource's original paper or official release.</p>
+</section>
+
+<section>
+ <h2>Benchmark: storing an additional state</h2>
+ <p class="lead">All methods keep the same 20% of the Gaussians of the same full target model and use the same refinement; the shared base-state model is stored once. Mean over the 26 transitions.</p>
+ <div class="tbl"><table>
+  <thead><tr><th>Method</th><th>Target PSNR ↑</th><th>ALL4 PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th><th>Storage (MiB) ↓</th></tr></thead>
+  <tbody>
+   <tr><td>Full (unselected reference)</td><td>29.51</td><td>28.42</td><td>0.9082</td><td>0.1687</td><td>507.35</td></tr>
+   <tr><td>Random selection</td><td>23.59</td><td>25.04</td><td>0.8338</td><td>0.2940</td><td>253.83</td></tr>
+   <tr><td>LightGaussian</td><td>28.27</td><td>27.77</td><td>0.9015</td><td>0.1816</td><td>253.83</td></tr>
+   <tr><td>Compact3DGS mask</td><td>29.39</td><td>28.51</td><td>0.9038</td><td>0.1861</td><td>253.83</td></tr>
+   <tr><td>PUP 3D-GS</td><td>24.33</td><td>25.24</td><td>0.8427</td><td>0.2620</td><td>253.83</td></tr>
+   <tr class="ours"><td>EmiState-GS (baseline)</td><td>30.13</td><td>28.96</td><td>0.9089</td><td>0.1754</td><td>253.83</td></tr>
+  </tbody></table></div>
+ <p class="tnote">Storage is the FP32 cost including the shared base model. ALL4 averages the target and three intermediate states.</p>
+ <figure class="fig" style="margin-top:28px"><img src="assets/fig3_method_v9.jpg" alt="Overview of EmiState-GS" loading="lazy">
+  <figcaption>EmiState-GS learns a per-Gaussian gate from the target observations and keeps exactly K Gaussians before a short refinement.</figcaption></figure>
+</section>
+
+<section>
+ <h2>Download and format</h2>
+ <div class="two">
+  <div style="min-width:0">
+   <pre><button class="copy" data-copy="dl">Copy</button><code id="dl">pip install -U huggingface_hub
+hf download logun99/EmiState-HDR \
+  --repo-type dataset --local-dir EmiState-HDR</code></pre>
+   <p style="font-size:15.5px;color:var(--muted)">About 254 GB. Single scenes can be fetched with <code>--include "scenes/tv/*"</code>. A real two-state Office capture with its COLMAP registration is included.</p>
   </div>
-  <figure>
-    <img src="assets/fig2_states_v10.jpg" alt="Base states, shared target state and change maps of the A and B transitions in the Cafe, Gallery, Transit and TV scenes" loading="lazy">
-    <figcaption>In each configuration, an A transition (room lighting) and a B transition (local emitter) lead from different base states to one shared target state. Cyan outlines mark the emissive-material mask.</figcaption>
-  </figure>
-  <div class="tbl">
-  <table>
-    <thead><tr><th>Scene</th><th>Configurations</th><th>Resolution</th><th>Samples</th><th>EXR</th><th>Local emitter</th></tr></thead>
-    <tbody>
-      <tr><td>Cafe</td><td>3</td><td>1200×1200</td><td>128</td><td>half</td><td>menu board</td></tr>
-      <tr><td>Gallery</td><td>3</td><td>1200×1200</td><td>128</td><td>half</td><td>emissive picture frame</td></tr>
-      <tr><td>Transit</td><td>3</td><td>1024×1024</td><td>128</td><td>half</td><td>sign</td></tr>
-      <tr><td>TV</td><td>4</td><td>1024×1024</td><td>1024</td><td>float</td><td>screen</td></tr>
-    </tbody>
-  </table>
+  <div style="min-width:0">
+<pre><code>scenes/&lt;scene&gt;/&lt;configuration&gt;/
+  scA_00 … scB_100/Camera_###.exr
+  cameras.json
+transitions/&lt;transition&gt;.json   # states + 80/80/40 split
+masks/       audit/       office/
+render_settings.csv
+tools/emistate_hdr.py</code></pre>
   </div>
-  <ul class="plain">
-    <li>Unclipped HDR EXRs exactly as rendered, with intermediate states at α = 0.2, 0.5, 0.8 (TV: every 0.1).</li>
-    <li>Camera poses, per-transition view splits, emissive-material masks, per-view audit results and per-image render settings.</li>
-    <li>A real two-state Office capture (240 frames) with its COLMAP registration.</li>
-  </ul>
+ </div>
+ <p class="tnote">Released under CC BY-NC 4.0. Scene assets come from BlenderKit and are not redistributed; only rendered results are released.</p>
 </section>
 
-<section id="method">
-  <h2>EmiState-GS baseline</h2>
-  <figure style="margin-top:6px">
-    <img src="assets/fig3_method_v9.jpg" alt="Overview of EmiState-GS: shared Base, full target candidate, gate learning with exact-K selection, and the retained target model" loading="lazy">
-  </figure>
-  <p style="margin-top:14px">EmiState-GS keeps one shared base-state model and, for each additional state, stores a target model reduced to a fixed fraction of the Gaussians. A per-Gaussian gate is learned from the target observations, exactly K Gaussians are retained, and the retained model is refined with the same schedule used for all compared selection criteria.</p>
-</section>
-
-<section id="download">
-  <h2>Download</h2>
-  <pre><button class="copy" data-copy="dl">Copy</button><code id="dl">pip install -U huggingface_hub
-hf download logun99/EmiState-HDR --repo-type dataset --local-dir EmiState-HDR</code></pre>
-  <p class="note">The dataset is released under CC BY-NC 4.0. Scene assets come from BlenderKit and are not redistributed; only rendered results are released. The code will be released on this page.</p>
-</section>
-
-<section id="citation">
-  <h2>Citation</h2>
-  <pre><button class="copy" data-copy="bib">Copy</button><code id="bib">@misc{lee2026emistatehdr,
+<section>
+ <h2>Citation</h2>
+ <div class="narrow">
+ <pre><button class="copy" data-copy="bib">Copy</button><code id="bib">@misc{lee2026emistatehdr,
   title  = {EmiState-HDR: A Synthetic Indoor HDR Multi-State Dataset and
             Learned Selection for Storing Observed Emissive States},
   author = {Lee, Hogeon and Ko, Jaerin and Lee, Jangwon},
   year   = {2026},
-  note   = {Dataset: https://huggingface.co/datasets/logun99/EmiState-HDR}
+  doi    = {10.57967/hf/10897},
+  url    = {https://huggingface.co/datasets/logun99/EmiState-HDR}
 }</code></pre>
+ </div>
 </section>
 
 <footer>Contact: Jangwon Lee (corresponding author), leejang@skku.edu</footer>
 </div>
+
 <script>
-document.querySelectorAll('.copy').forEach(function(b){
-  b.addEventListener('click',function(){
-    var t=document.getElementById(b.dataset.copy).innerText;
-    try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)},function(){sel(b.dataset.copy)})}catch(e){sel(b.dataset.copy)}
-  });
-});
-function sel(id){var r=document.createRange();r.selectNodeContents(document.getElementById(id));var s=window.getSelection();s.removeAllRanges();s.addRange(r)}
+var SW = {
+ cafe:{name:'Cafe', cfg:'cafe_01', lv:[0,20,50,80,100]},
+ gallery:{name:'Gallery', cfg:'gallery_01', lv:[0,20,50,80,100]},
+ transit:{name:'Transit', cfg:'transit_01', lv:[0,20,50,80,100]},
+ tv:{name:'TV', cfg:'tv_origin', lv:[0,10,20,30,40,50,60,70,80,90,100]}
+};
+var PATH = {A:'A · room light', B:'B · local emitter'};
+var DESC = {A:'Room lighting rises while the local emitter stays on', B:'Local emitter rises while the room lighting stays on'};
+var CFGS = ['cafe_01','cafe_02','cafe_03','gallery_01','gallery_02','gallery_03','transit_01','transit_02','transit_03','tv_origin','tv_quad4','tv_white','tv_natural'];
+var st = {scene:'tv', path:'B', i:0, playing:false, dir:1, front:'imA'}, timer=null;
+var $ = function(id){return document.getElementById(id)};
+function src(i){var s=SW[st.scene]; var a=String(s.lv[i]).padStart(3,'0'); return 'assets/sweep/'+s.cfg+'_'+st.path+'_'+a+'.jpg'}
+function preload(){SW[st.scene].lv.forEach(function(_,i){var im=new Image(); im.src=src(i)})}
+function show(i, instant){
+ st.i=i; var back = st.front==='imA'?'imB':'imA';
+ var b=$(back), f=$(st.front);
+ if(instant){f.src=src(i); b.style.opacity=0; f.style.opacity=1}
+ else{b.onload=function(){b.style.opacity=1; f.style.opacity=0; st.front=back}; b.src=src(i)}
+ $('alab').textContent='α = '+(SW[st.scene].lv[i]/100).toFixed(1);
+ $('slider').value=i;
+}
+function segs(){
+ var s=$('sceneSeg'); s.innerHTML='';
+ Object.keys(SW).forEach(function(k){var b=document.createElement('button'); b.textContent=SW[k].name; b.setAttribute('aria-pressed',k===st.scene); b.onclick=function(){st.scene=k; reset()}; s.appendChild(b)});
+ var p=$('pathSeg'); p.innerHTML='';
+ Object.keys(PATH).forEach(function(k){var b=document.createElement('button'); b.textContent=PATH[k]; b.setAttribute('aria-pressed',k===st.path); b.onclick=function(){st.path=k; reset()}; p.appendChild(b)});
+}
+function ticks(){var t=$('ticks'); t.innerHTML=''; SW[st.scene].lv.forEach(function(a){var s=document.createElement('span'); s.textContent=(a/100).toFixed(1); t.appendChild(s)})}
+function reset(){var n=SW[st.scene].lv.length; $('slider').max=n-1; segs(); ticks(); preload(); $('vdesc').textContent=SW[st.scene].name+': '+DESC[st.path]; show(0,true)}
+function step(){var n=SW[st.scene].lv.length; var j=st.i+st.dir; if(j>=n||j<0){st.dir*=-1; j=st.i+st.dir} show(j)}
+function setPlay(on){st.playing=on; clearInterval(timer); if(on){timer=setInterval(step, SW[st.scene].lv.length>6?650:1100)}
+ $('pico').innerHTML = on?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="M7 4v16l13-8z"/>'}
+$('play').onclick=function(){setPlay(!st.playing)};
+$('slider').oninput=function(){setPlay(false); show(+this.value)};
+reset(); setPlay(true);
+var g=$('gallery'); [['Cafe','cafe'],['Gallery','gallery'],['Transit','transit'],['TV','tv']].forEach(function(sc){var cs=CFGS.filter(function(c){return c.indexOf(sc[1]+'_')===0}); var d=document.createElement('div'); d.className='grp'; d.innerHTML='<h3>'+sc[0]+'</h3>'; var gg=document.createElement('div'); gg.className='gallery'; gg.style.gridTemplateColumns='repeat('+cs.length+',1fr)'; cs.forEach(function(c){var f=document.createElement('figure'); f.innerHTML='<img loading="lazy" src="assets/configs/'+c+'.jpg" alt="Target state of '+c+'"><figcaption>'+c.split('_')[1]+'</figcaption>'; gg.appendChild(f)}); d.appendChild(gg); g.appendChild(d)});
+document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){var t=$(b.dataset.copy).innerText;
+ try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1400)},function(){sel(b.dataset.copy)})}catch(e){sel(b.dataset.copy)}})});
+function sel(id){var r=document.createRange();r.selectNodeContents($(id));var s=getSelection();s.removeAllRanges();s.addRange(r)}
 </script>
 </body>
 </html>
