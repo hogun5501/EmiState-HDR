@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EmiState-HDR</title>
+<meta name="description" content="EmiState-HDR: a synthetic indoor HDR multi-state dataset and learned selection for storing observed emissive states with 3D Gaussian Splatting.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#f3f1ec; --fg:#1d1c1a; --muted:#5f5b54; --line:#e2ded6;
+  --accent:#b45f06; --accent-soft:#f6e7d4; --code-bg:#f0ede6;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141311; --surface:#1d1c19; --fg:#ecebe7; --muted:#a9a59c; --line:#34312c;
+    --accent:#f0a24a; --accent-soft:#3a2a17; --code-bg:#22201c; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141311; --surface:#1d1c19; --fg:#ecebe7; --muted:#a9a59c; --line:#34312c;
+  --accent:#f0a24a; --accent-soft:#3a2a17; --code-bg:#22201c; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:56px 72px}
+header{text-align:center;display:grid;gap:18px}
+h1{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:clamp(28px,4.6vw,44px);line-height:1.15;margin:0;text-wrap:balance}
+h1 .name{color:var(--accent)}
+.subtitle{font-family:"Source Serif 4",Georgia,serif;font-size:clamp(18px,2.4vw,22px);font-weight:500;color:var(--muted);margin:0;text-wrap:balance}
+.authors{font-size:17px;margin:4px 0 0}
+.authors a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.affil{font-size:14px;color:var(--muted);margin:0}
+.venue{display:inline-block;justify-self:center;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:4px 12px;border-radius:999px}
+.links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;font-weight:500;font-size:15px;text-decoration:none;border:1px solid var(--fg);color:var(--fg)}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn.off{border-color:var(--line);color:var(--muted);cursor:default}
+.btn small{font-weight:400;font-size:12px;opacity:.8}
+figure{margin:40px 0 0}
+figure img{display:block;width:100%;max-width:100%;height:auto;border-radius:6px;background:#fff;border:1px solid var(--line)}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px}
+section{margin-top:56px}
+h2{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:26px;margin:0 0 14px}
+p{margin:0 0 14px;max-width:72ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:6px}
+.stat{background:var(--surface);padding:16px 18px}
+.stat b{display:block;font-family:"Source Serif 4",Georgia,serif;font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:13px;color:var(--muted)}
+ul.plain{margin:6px 0 0;padding-left:20px;max-width:72ch}
+ul.plain li{margin:4px 0}
+.tbl{overflow-x:auto;margin-top:6px}
+table{border-collapse:collapse;font-size:14px;min-width:520px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 14px 7px 0;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:14px 16px;overflow-x:auto;font:13px/1.55 "IBM Plex Mono",ui-monospace,monospace;margin:6px 0 14px}
+code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.92em}
+.note{font-size:14px;color:var(--muted)}
+.copy{float:right;font:12px "IBM Plex Sans",sans-serif;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:4px;padding:3px 9px;cursor:pointer}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="venue">Under review · Computational Visual Media</span>
+  <h1><span class="name">EmiState-HDR</span></h1>
+  <p class="subtitle">A Synthetic Indoor HDR Multi-State Dataset and Learned Selection for Storing Observed Emissive States</p>
+  <p class="authors">Hogeon Lee<sup>1,2</sup> &nbsp;·&nbsp; Jaerin Ko<sup>3</sup> &nbsp;·&nbsp; Jangwon Lee<sup>1</sup></p>
+  <p class="affil"><sup>1</sup>Sungkyunkwan University &nbsp; <sup>2</sup>SFACSPACE &nbsp; <sup>3</sup>Hongik University</p>
+  <nav class="links">
+    <a class="btn primary" href="https://huggingface.co/datasets/logun99/EmiState-HDR">Dataset</a>
+    <span class="btn off">Paper <small>coming soon</small></span>
+    <span class="btn off">Code <small>coming soon</small></span>
+  </nav>
+</header>
+
+<figure>
+  <img src="assets/fig1_teaser_v10.jpg" alt="Change maps between the base and target emissive states of an indoor scene, and target-state PSNR versus storage for equal-count selection methods" loading="eager">
+  <figcaption>When a display or light changes state, the change spreads well beyond the emitter. Even when only a TV screen turns on, 53.1% of the display-space image change lies outside the screen.</figcaption>
+</figure>
+
+<section id="abstract">
+  <h2>Abstract</h2>
+  <p>When a display or light in a room changes state, the walls and floor that receive its light change too. Revisiting observed emissive states from novel views requires one stored representation per state, yet no public indoor dataset with state-specific training views supports measuring how compactly an additional state can be stored.</p>
+  <p>We present EmiState-HDR, a synthetic high-dynamic-range dataset of four indoor scenes, 13 configurations and 26 state transitions, with disjoint training views per state, evaluation views shared by all states, intermediate-state ground truth with known state values, emissive-material masks, and a per-view linearity audit of the ground truth. With 3D Gaussian Splatting, keeping the same number of Gaussians from the same full target model under the same refinement, existing selection criteria span 5.06&nbsp;dB in target-state PSNR. As a baseline for this protocol, EmiState-GS learns a per-Gaussian gate from the target observations and keeps exactly the specified number of Gaussians.</p>
+</section>
+
+<section id="dataset">
+  <h2>Dataset at a glance</h2>
+  <div class="stats">
+    <div class="stat"><b>4</b><span>indoor scenes</span></div>
+    <div class="stat"><b>13</b><span>configurations</span></div>
+    <div class="stat"><b>26</b><span>state transitions</span></div>
+    <div class="stat"><b>33,000</b><span>rendered HDR EXRs</span></div>
+    <div class="stat"><b>80 / 80 / 40</b><span>base / target / eval views</span></div>
+  </div>
+  <figure>
+    <img src="assets/fig2_states_v10.jpg" alt="Base states, shared target state and change maps of the A and B transitions in the Cafe, Gallery, Transit and TV scenes" loading="lazy">
+    <figcaption>In each configuration, an A transition (room lighting) and a B transition (local emitter) lead from different base states to one shared target state. Cyan outlines mark the emissive-material mask.</figcaption>
+  </figure>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>Scene</th><th>Configurations</th><th>Resolution</th><th>Samples</th><th>EXR</th><th>Local emitter</th></tr></thead>
+    <tbody>
+      <tr><td>Cafe</td><td>3</td><td>1200×1200</td><td>128</td><td>half</td><td>menu board</td></tr>
+      <tr><td>Gallery</td><td>3</td><td>1200×1200</td><td>128</td><td>half</td><td>emissive picture frame</td></tr>
+      <tr><td>Transit</td><td>3</td><td>1024×1024</td><td>128</td><td>half</td><td>sign</td></tr>
+      <tr><td>TV</td><td>4</td><td>1024×1024</td><td>1024</td><td>float</td><td>screen</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="plain">
+    <li>Unclipped HDR EXRs exactly as rendered, with intermediate states at α = 0.2, 0.5, 0.8 (TV: every 0.1).</li>
+    <li>Camera poses, per-transition view splits, emissive-material masks, per-view audit results and per-image render settings.</li>
+    <li>A real two-state Office capture (240 frames) with its COLMAP registration.</li>
+  </ul>
+</section>
+
+<section id="method">
+  <h2>EmiState-GS baseline</h2>
+  <figure style="margin-top:6px">
+    <img src="assets/fig3_method_v9.jpg" alt="Overview of EmiState-GS: shared Base, full target candidate, gate learning with exact-K selection, and the retained target model" loading="lazy">
+  </figure>
+  <p style="margin-top:14px">EmiState-GS keeps one shared base-state model and, for each additional state, stores a target model reduced to a fixed fraction of the Gaussians. A per-Gaussian gate is learned from the target observations, exactly K Gaussians are retained, and the retained model is refined with the same schedule used for all compared selection criteria.</p>
+</section>
+
+<section id="download">
+  <h2>Download</h2>
+  <pre><button class="copy" data-copy="dl">Copy</button><code id="dl">pip install -U huggingface_hub
+hf download logun99/EmiState-HDR --repo-type dataset --local-dir EmiState-HDR</code></pre>
+  <p class="note">The dataset is released under CC BY-NC 4.0. Scene assets come from BlenderKit and are not redistributed; only rendered results are released. The code will be released on this page.</p>
+</section>
+
+<section id="citation">
+  <h2>Citation</h2>
+  <pre><button class="copy" data-copy="bib">Copy</button><code id="bib">@misc{lee2026emistatehdr,
+  title  = {EmiState-HDR: A Synthetic Indoor HDR Multi-State Dataset and
+            Learned Selection for Storing Observed Emissive States},
+  author = {Lee, Hogeon and Ko, Jaerin and Lee, Jangwon},
+  year   = {2026},
+  note   = {Dataset: https://huggingface.co/datasets/logun99/EmiState-HDR}
+}</code></pre>
+</section>
+
+<footer>Contact: Jangwon Lee (corresponding author), leejang@skku.edu</footer>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=document.getElementById(b.dataset.copy).innerText;
+    try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1500)},function(){sel(b.dataset.copy)})}catch(e){sel(b.dataset.copy)}
+  });
+});
+function sel(id){var r=document.createRange();r.selectNodeContents(document.getElementById(id));var s=window.getSelection();s.removeAllRanges();s.addRange(r)}
+</script>
+</body>
+</html>
