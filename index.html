@@ -212,7 +212,7 @@ a{color:var(--accent)}
    <pre><button class="copy" data-copy="dl">Copy</button><code id="dl">pip install -U huggingface_hub
 hf download logun99/EmiState-HDR \
   --repo-type dataset --local-dir EmiState-HDR</code></pre>
-   <p style="font-size:15.5px;color:var(--muted)">About 254 GB. Single scenes can be fetched with <code>--include "scenes/tv/*"</code>. A real two-state Office capture with its COLMAP registration is included.</p>
+   <p style="font-size:15.5px;color:var(--muted)">About 254 GB. Single scenes can be fetched with <code>--include "scenes/tv/*"</code>. Two real office captures with their COLMAP registrations are included: Office (two states) and Office 2 (three states).</p>
   </div>
   <div style="min-width:0">
    <dl class="fmt">
@@ -220,7 +220,7 @@ hf download logun99/EmiState-HDR \
     <dt>transitions/</dt><dd>One file per transition: states and the 80 / 80 / 40 view split</dd>
     <dt>masks/</dt><dd>Emissive-material masks at the evaluation views</dd>
     <dt>audit/</dt><dd>Per-view ground-truth audit results</dd>
-    <dt>office/</dt><dd>Real two-state capture with COLMAP registration</dd>
+    <dt>office/</dt><dd>Real captures (Office, Office 2) with COLMAP registration</dd>
     <dt>tools/</dt><dd>Reader, display transform, PSNR and compositor inversion</dd>
    </dl>
   </div>
